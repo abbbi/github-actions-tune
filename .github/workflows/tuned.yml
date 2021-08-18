@@ -13,6 +13,8 @@ jobs:
       run: sudo sed -i 's/yes/no/g' /etc/initramfs-tools/update-initramfs.conf
     - name: Disable man-db update
       run: sudo rm -f /var/lib/man-db/auto-update
+    - name: Disable fontconfig trigger
+      run: sudo sed '/fontconfig/d' -i /var/lib/dpkg/triggers/File
     - name: Update apt sources
       run: sudo apt-get update -y
     - name: Install libguestfs-tools

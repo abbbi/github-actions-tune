@@ -17,6 +17,8 @@ jobs:
       run: sudo sed '/fontconfig/d' -i /var/lib/dpkg/triggers/File
     - name: Disable install-info trigger
       run: sudo sed '/install-info/d' -i /var/lib/dpkg/triggers/File
+    - name: Disable mime related triggers
+      run: sudo sed '/mime/d' -i /var/lib/dpkg/triggers/File
     - name: Update apt sources
       run: sudo apt-get update -y
     - name: Install libguestfs-tools

@@ -12,7 +12,7 @@ jobs:
     - name: Disable initramfs update
       run: sudo sed -i 's/yes/no/g' /etc/initramfs-tools/update-initramfs.conf
     - name: Disable man-db update
-      run: sudo rm -f /var/lib/man-db/auto-update
+      run: echo 'man-db man-db/auto-update boolean false' |sudo debconf-set-selections
     - name: Update apt sources
       run: sudo apt-get update -y
     - name: Install libguestfs-tools

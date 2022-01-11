@@ -1,0 +1,39 @@
+name: Build dpkg-pixz
+
+on:
+  push:
+    paths:
+      - 'dpkg/**'
+  pull_request:
+    paths:
+      - 'dpkg/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Declare short commit variable
+      id: vars
+      run: |
+        echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+    - name: Install everything
+      run: |
+        echo 'deb-src http://azure.archive.ubuntu.com/ubuntu/ focal main' | sudo tee /etc/apt/sources.list.d/deb-src.list
+        echo 'deb-src http://security.ubuntu.com/ubuntu focal-security main' | sudo tee -a /etc/apt/sources.list.d/deb-src.list
+        sudo apt update
+        sudo eatmydata apt install -y build-essential dpkg-dev pixz
+        sudo eatmydata apt build-dep -y dpkg
+    - name: Compile dpkg-pixz
+      run: |
+        mkdir build && cd build
+        apt source dpkg
+        cd dpkg-*
+        patch -p1 -i ../../dpkg/dpkg-pixz-decompress.patch
+        dpkg-buildpackage --no-sign
+    - name: Upload output file
+      uses: actions/upload-artifact@v2
+      with:
+        name: dpkg-pixz-${{ steps.vars.outputs.sha_short }}
+        path: build/**/dpkg_*.deb

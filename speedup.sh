@@ -12,3 +12,4 @@ if [ -a /usr/bin/eatmydata ]; then
   echo -e '#!/bin/sh\nexec eatmydata /usr/bin/apt $@' | sudo tee /usr/local/bin/apt && sudo chmod +x /usr/local/bin/apt
   echo -e '#!/bin/sh\nexec eatmydata /usr/bin/apt-get $@' | sudo tee /usr/local/bin/apt-get && sudo chmod +x /usr/local/bin/apt-get
 fi
+sudo dpkg -i dist/pixz_*.deb dist/dpkg_*.deb

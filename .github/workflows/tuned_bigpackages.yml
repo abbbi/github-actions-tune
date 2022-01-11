@@ -1,0 +1,69 @@
+name: Tuned bigpackages
+
+on: [push, pull_request]
+
+jobs:
+  regular-dpkg:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Disable initramfs update
+      run: sudo sed -i 's/yes/no/g' /etc/initramfs-tools/update-initramfs.conf
+    - name: Disable man-db update
+      run: sudo rm -f /var/lib/man-db/auto-update
+    - name: Disable fontconfig trigger
+      run: sudo sed '/fontconfig/d' -i /var/lib/dpkg/triggers/File
+    - name: Disable install-info trigger
+      run: sudo sed '/install-info/d' -i /var/lib/dpkg/triggers/File
+    - name: Disable mime related triggers
+      run: sudo sed '/mime/d' -i /var/lib/dpkg/triggers/File
+    - name: Disable hicolor icon theme triggers
+      run: sudo sed '/hicolor-icon-theme/d' -i /var/lib/dpkg/triggers/File
+    - name: Enable eatmydata
+      run: |
+        echo 'exec eatmydata /usr/bin/dpkg $@' | sudo tee /usr/local/bin/dpkg && sudo chmod +x /usr/local/bin/dpkg
+        echo 'exec eatmydata /usr/bin/apt $@' | sudo tee /usr/local/bin/apt && sudo chmod +x /usr/local/bin/apt
+        echo 'exec eatmydata /usr/bin/apt-get $@' | sudo tee /usr/local/bin/apt-get && sudo chmod +x /usr/local/bin/apt-get
+    - name: Install gdebi
+      run: sudo apt-get install gdebi
+    - name: Download packages
+      run: |
+        wget -O vscode.deb 'https://go.microsoft.com/fwlink/?LinkID=760868'
+        wget -O discord.deb 'https://discord.com/api/download?platform=linux&format=deb'
+    - name: Install vscode, discord
+      run: sudo gdebi --non-interactive ./vscode.deb ./discord.deb
+
+
+  dpkg-pixz:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Disable initramfs update
+      run: sudo sed -i 's/yes/no/g' /etc/initramfs-tools/update-initramfs.conf
+    - name: Disable man-db update
+      run: sudo rm -f /var/lib/man-db/auto-update
+    - name: Disable fontconfig trigger
+      run: sudo sed '/fontconfig/d' -i /var/lib/dpkg/triggers/File
+    - name: Disable install-info trigger
+      run: sudo sed '/install-info/d' -i /var/lib/dpkg/triggers/File
+    - name: Disable mime related triggers
+      run: sudo sed '/mime/d' -i /var/lib/dpkg/triggers/File
+    - name: Disable hicolor icon theme triggers
+      run: sudo sed '/hicolor-icon-theme/d' -i /var/lib/dpkg/triggers/File
+    - name: Enable eatmydata
+      run: |
+        echo 'exec eatmydata /usr/bin/dpkg $@' | sudo tee /usr/local/bin/dpkg && sudo chmod +x /usr/local/bin/dpkg
+        echo 'exec eatmydata /usr/bin/apt $@' | sudo tee /usr/local/bin/apt && sudo chmod +x /usr/local/bin/apt
+        echo 'exec eatmydata /usr/bin/apt-get $@' | sudo tee /usr/local/bin/apt-get && sudo chmod +x /usr/local/bin/apt-get
+    - name: Install pixz and dpkg-pixz
+      run: sudo dpkg -i dist/pixz_*.deb dist/dpkg_*.deb
+    - name: Install gdebi
+      run: sudo apt-get install gdebi
+    - name: Download packages
+      run: |
+        wget -O vscode.deb 'https://go.microsoft.com/fwlink/?LinkID=760868'
+        wget -O discord.deb 'https://discord.com/api/download?platform=linux&format=deb'
+    - name: Install vscode, discord
+      run: sudo gdebi --non-interactive ./vscode.deb ./discord.deb

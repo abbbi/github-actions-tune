@@ -1,0 +1,53 @@
+diff -ru dpkg-1.19.7ubuntu3_/debian/control dpkg-1.19.7ubuntu3/debian/control
+--- dpkg-1.19.7ubuntu3_/debian/control	2022-01-11 16:31:06.980630844 +0300
++++ dpkg-1.19.7ubuntu3/debian/control	2022-01-11 16:31:09.588658007 +0300
+@@ -34,6 +34,7 @@
+ Pre-Depends:
+  ${shlibs:Depends},
+ Depends:
++ pixz,
+  ${misc:Depends},
+ # Needed for --clamp-mtime in dpkg-deb -b.
+  tar (>= 1.28-1),
+diff -ru dpkg-1.19.7ubuntu3_/debian/rules dpkg-1.19.7ubuntu3/debian/rules
+--- dpkg-1.19.7ubuntu3_/debian/rules	2022-01-11 16:31:06.981630855 +0300
++++ dpkg-1.19.7ubuntu3/debian/rules	2022-01-11 16:31:09.966661944 +0300
+@@ -66,7 +66,7 @@
+ 		--without-libmd \
+ 		--with-libz \
+ 		--with-libzstd \
+-		--with-liblzma \
++		--without-liblzma \
+ 		--with-libbz2
+ 
+ # Build the package in build-tree
+diff -ru dpkg-1.19.7ubuntu3_/lib/dpkg/compress.c dpkg-1.19.7ubuntu3/lib/dpkg/compress.c
+--- dpkg-1.19.7ubuntu3_/lib/dpkg/compress.c	2022-01-11 16:31:06.992630970 +0300
++++ dpkg-1.19.7ubuntu3/lib/dpkg/compress.c	2022-01-11 16:31:09.594658069 +0300
+@@ -82,6 +82,7 @@
+ 		command_add_argv(&cmd, args);
+ 		va_end(args);
+ 
++		close(2);
+ 		command_exec(&cmd);
+ 	}
+ 	subproc_reap(pid, desc, 0);
+@@ -397,7 +398,8 @@
+  * Xz compressor.
+  */
+ 
+-#define XZ		"xz"
++#define XZ "xz"
++#define PIXZ "pixz"
+ 
+ #ifdef WITH_LIBLZMA
+ enum dpkg_stream_status {
+@@ -635,7 +637,7 @@
+ static void
+ decompress_xz(int fd_in, int fd_out, const char *desc)
+ {
+-	fd_fd_filter(fd_in, fd_out, desc, env_xz, XZ, "-dc", NULL);
++	fd_fd_filter(fd_in, fd_out, desc, env_xz, PIXZ, "-dc", NULL);
+ }
+ 
+ static void

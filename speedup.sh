@@ -1,11 +1,21 @@
 #!/bin/bash
-sudo sed -i 's/yes/no/g' /etc/initramfs-tools/update-initramfs.conf
+INITRAMFS_CONF="/etc/initramfs-tools/update-initramfs.conf"
+DPKG_TRIGGERS="/var/lib/dpkg/triggers/File"
+
+if [ -e /etc/initramfs-tools/update-initramfs.conf ]; then
+    sudo sed -i 's/yes/no/g' $INITRAMFS_CONF
+fi
 sudo rm -f /var/lib/man-db/auto-update
-sudo sed '/fontconfig/d' -i /var/lib/dpkg/triggers/File
-sudo sed '/install-info/d' -i /var/lib/dpkg/triggers/File
-sudo sed '/mime/d' -i /var/lib/dpkg/triggers/File
-sudo sed '/hicolor-icon-theme/d' -i /var/lib/dpkg/triggers/File
+
+if [ -e $DPKG_TRIGGERS ]; then
+    sudo sed '/fontconfig/d' -i $DPKG_TRIGGERS
+    sudo sed '/install-info/d' -i $DPKG_TRIGGERS
+    sudo sed '/mime/d' -i $DPKG_TRIGGERS
+    sudo sed '/hicolor-icon-theme/d' -i $DPKG_TRIGGERS
+fi
+
 echo "force-unsafe-io" | sudo tee -a /etc/dpkg/dpkg.cfg.d/force-unsafe-io
+
 if [ -a /usr/bin/eatmydata ]; then
   echo "eatmydata available"
   echo -e '#!/bin/sh\nexec eatmydata /usr/bin/dpkg $@' | sudo tee /usr/local/bin/dpkg && sudo chmod +x /usr/local/bin/dpkg

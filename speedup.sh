@@ -2,7 +2,7 @@
 INITRAMFS_CONF="/etc/initramfs-tools/update-initramfs.conf"
 DPKG_TRIGGERS="/var/lib/dpkg/triggers/File"
 
-if [ -e /etc/initramfs-tools/update-initramfs.conf ]; then
+if [ -e $INITRAMFS_CONF ]; then
     sudo sed -i 's/yes/no/g' $INITRAMFS_CONF
 fi
 sudo rm -f /var/lib/man-db/auto-update
